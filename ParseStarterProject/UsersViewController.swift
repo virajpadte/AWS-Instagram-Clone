@@ -91,14 +91,40 @@ class UsersViewController: UITableViewController {
     }
  
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCellAccessoryType.checkmark{
+            //already checked so now we need to uncheck
+            //uncheck the selected a row
+            //before unchecking, alert the user
+            let alertController = UIAlertController(title: "Unfollow", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
+            alertController.addAction(UIAlertAction(title: "Unfollow", style: UIAlertActionStyle.destructive, handler: { (alerted) in
+                self.table.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
+                //self.dismiss(animated: true, completion: nil)
+            }))
+            alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: { (alerted) in
+                //make the view dissapper
+                //self.dismiss(animated: true, completion: nil)
+            }))
+            
+            self.present(alertController, animated: true, completion: nil)
+        }else{
+            //unchecked row .. so we can check it
+            //check the selected a row
+            table.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.checkmark
+        }
+        
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-    */
 
+    */
+    
     /*
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
