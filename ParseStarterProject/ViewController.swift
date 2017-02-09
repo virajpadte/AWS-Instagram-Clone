@@ -18,30 +18,67 @@ class ViewController: UIViewController {
     
     var signUpMode = true
     
+    let activityIndicator = UIActivityIndicatorView()
+
+    
     @IBAction func signupOrLogin(_ sender: Any) {
         if emailTextField.text == "" || passwordTextField.text == ""{
             showAlert(title: "Expected Error", message: "You need to enter both username and password")
         
         }
         else{
-            //attempt to sign up via parse.
-            let user = PFUser()
-            user.email = emailTextField.text
-            user.username = emailTextField.text
-            user.password = passwordTextField.text
+            //show activity indicator as the task below this will take time
             
-            user.signUpInBackground(block: { (signed, error) in
-                if error != nil{
-                    if let errorDict = error{
-                        let errorMessage  = errorDict.localizedDescription
-                        self.showAlert(title: "Opps", message: errorMessage)
+            activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+            activityIndicator.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+            activityIndicator.center = view.center
+            view.addSubview(activityIndicator)
+            activityIndicator.startAnimating()
+            UIApplication.shared.beginIgnoringInteractionEvents()
+            
+            if signUpMode{
+                //attempt to sign up via parse.
+                let user = PFUser()
+                user.email = emailTextField.text
+                user.username = emailTextField.text
+                user.password = passwordTextField.text
+                
+                user.signUpInBackground(block: { (signed, error) in
+                    if error != nil{
+                        self.activityIndicator.stopAnimating()
+                        UIApplication.shared.endIgnoringInteractionEvents()
+                        if let errorDict = error{
+                            let errorMessage  = errorDict.localizedDescription
+                            self.showAlert(title: "Opps", message: errorMessage)
+                        }
                     }
-                    
-                }
-                else{
-                    print("signed up")
-                }
-            })
+                    else{
+                        print("signed up")
+                        self.activityIndicator.stopAnimating()
+                        UIApplication.shared.endIgnoringInteractionEvents()
+                    }
+                })
+            }
+            else{
+                PFUser.logInWithUsername(inBackground: emailTextField.text!, password: passwordTextField.text!, block: { (user, error) in
+                    if error != nil{
+                        print(error)
+                        if let parsedError = error{
+                            self.activityIndicator.stopAnimating()
+                            UIApplication.shared.endIgnoringInteractionEvents()
+                            self.showAlert(title: "Opps", message: parsedError.localizedDescription)
+                        }
+                    }
+                    else{
+                        print("logged in")
+                        self.activityIndicator.stopAnimating()
+                        UIApplication.shared.endIgnoringInteractionEvents()
+                    }
+                })
+            
+            
+            }
+            
             
             
         }
