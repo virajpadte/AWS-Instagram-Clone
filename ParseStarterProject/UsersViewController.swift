@@ -9,6 +9,14 @@
 import UIKit
 import Parse
 class UsersViewController: UITableViewController {
+    
+    
+    @IBOutlet var table: UITableView!
+    //make empty arrays for holding usernames and objectIDs
+    
+    var userNames = [String]()
+    var userIDs = [String]()
+    
     @IBAction func logout(_ sender: Any) {
         PFUser.logOut()
         performSegue(withIdentifier: "toLoginPage", sender: self)
@@ -26,6 +34,36 @@ class UsersViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         self.navigationController?.isNavigationBarHidden = false
         self.navigationItem.hidesBackButton = true
+        
+        //get the list of all the registered users
+        
+        let query = PFUser.query()
+        query?.findObjectsInBackground(block: { (object, error) in
+            if error != nil{
+                print(error)
+            }
+            else if let retrivedObject = object as? NSArray{
+                print(retrivedObject)
+                if retrivedObject.count > 0 {
+                    print("we have atleast one user registered")
+                    for element in retrivedObject{
+                        if let individualUser = element as? PFUser {
+                            if individualUser.username! != PFUser.current()?.username{
+                                self.userNames.append(individualUser.username!)
+                                self.userIDs.append(individualUser.objectId!)
+                            }
+                        }
+                    }
+                }
+                
+            }
+            //print acquired data
+            print(self.userNames)
+            print(self.userIDs)
+            //referesh array data
+            self.table.reloadData()
+        }
+        )
     }
 
     override func didReceiveMemoryWarning() {
@@ -42,13 +80,13 @@ class UsersViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 4
+        return userNames.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-        cell.textLabel?.text = "test"
+        cell.textLabel?.text = userNames[indexPath.row]
         return cell
     }
  

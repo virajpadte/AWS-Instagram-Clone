@@ -42,6 +42,7 @@
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="table" destination="p25-A3-tvi" id="OPZ-ee-oHW"/>
                         <segue destination="BYZ-38-t0r" kind="show" identifier="toLoginPage" id="gkr-G6-9g6"/>
                     </connections>
                 </tableViewController>
