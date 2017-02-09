@@ -19,18 +19,12 @@ class ViewController: UIViewController {
     var signUpMode = true
     
     let activityIndicator = UIActivityIndicatorView()
-
-    override func viewDidAppear(_ animated: Bool) {
-        /*
-        if PFUser.current() != nil{
-            //this means some user is logged in for the current session
-            self.performSegue(withIdentifier: "toUserList", sender: self)
-        }
- */
-        
-    }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
+        if (PFUser.current() != nil){
+            let getCurrentUser = PFUser.current()
+            print("Current user: \(getCurrentUser?.email)")
+        }
         self.navigationController?.isNavigationBarHidden = true
     }
     

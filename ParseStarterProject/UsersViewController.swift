@@ -1,5 +1,5 @@
 //
-//  UserTableViewController.swift
+//  UsersViewController.swift
 //  ParseStarterProject-Swift
 //
 //  Created by Viraj Padte on 2/8/17.
@@ -8,16 +8,14 @@
 
 import UIKit
 import Parse
-
-class UserTableViewController: UITableViewController {
-
+class UsersViewController: UITableViewController {
     @IBAction func logout(_ sender: Any) {
+        PFUser.logOut()
         performSegue(withIdentifier: "toLoginPage", sender: self)
+        print("logout")
+        
     }
- 
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.isNavigationBarHidden = false
-    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -26,6 +24,8 @@ class UserTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        self.navigationController?.isNavigationBarHidden = false
+        self.navigationItem.hidesBackButton = true
     }
 
     override func didReceiveMemoryWarning() {
@@ -48,9 +48,10 @@ class UserTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-        cell.textLabel?.text = "Test"
+        cell.textLabel?.text = "test"
         return cell
     }
+ 
 
     /*
     // Override to support conditional editing of the table view.
