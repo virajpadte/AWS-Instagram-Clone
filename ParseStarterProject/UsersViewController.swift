@@ -97,21 +97,63 @@ class UsersViewController: UITableViewController {
             //already checked so now we need to uncheck
             //uncheck the selected a row
             //before unchecking, alert the user
-            let alertController = UIAlertController(title: "Unfollow", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
+            let alertController = UIAlertController(title: "Unfollow \(userNames[indexPath.row].components(separatedBy: "@")[0])", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
             alertController.addAction(UIAlertAction(title: "Unfollow", style: UIAlertActionStyle.destructive, handler: { (alerted) in
                 self.table.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
-                //self.dismiss(animated: true, completion: nil)
+                //update the entry in the Followers class
+                //fetch data corresponding to the current user's object id and the followers object id
+                let currentObjectID = PFUser.current()?.objectId
+                let followingObjectID = self.userIDs[indexPath.row]
+                
+                let query = PFQuery(className: "Followers")
+                query.whereKey("Follower", equalTo: currentObjectID)
+                query.whereKey("Following", equalTo: followingObjectID)
+
+                query.findObjectsInBackground(block: { (objects, error) in
+                    if error != nil{
+                        print(error)
+                    }
+                    else if let retrivedObjects = objects{
+                        for object in retrivedObjects{
+                            object.deleteInBackground(block: { (deleted, error) in
+                                if error != nil{
+                                    print("Couldn't delete")
+                                }
+                                else if deleted{
+                                    print("deleted")
+                                }
+                            })
+                        }
+                    
+                    }
+                })
+                
+                
+                
             }))
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: { (alerted) in
-                //make the view dissapper
-                //self.dismiss(animated: true, completion: nil)
             }))
-            
             self.present(alertController, animated: true, completion: nil)
+            
         }else{
             //unchecked row .. so we can check it
             //check the selected a row
             table.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.checkmark
+            //add an entry in the Followers class
+            
+            let newFollowerEntry = PFObject(className: "Followers")
+            let currentObjectID = PFUser.current()?.objectId
+            let followingObjectID = userIDs[indexPath.row]
+            newFollowerEntry.setObject(currentObjectID, forKey: "Follower")
+            newFollowerEntry.setObject(followingObjectID, forKey: "Following")
+            newFollowerEntry.saveInBackground(block: { (saved, error) in
+                if error != nil{
+                    print(error)
+                }
+                else if saved{
+                    print("saved")
+                }
+            })
         }
         
     }
