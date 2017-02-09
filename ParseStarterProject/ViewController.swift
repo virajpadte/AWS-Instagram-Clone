@@ -20,6 +20,19 @@ class ViewController: UIViewController {
     
     let activityIndicator = UIActivityIndicatorView()
 
+    override func viewDidAppear(_ animated: Bool) {
+        /*
+        if PFUser.current() != nil{
+            //this means some user is logged in for the current session
+            self.performSegue(withIdentifier: "toUserList", sender: self)
+        }
+ */
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = true
+    }
     
     @IBAction func signupOrLogin(_ sender: Any) {
         if emailTextField.text == "" || passwordTextField.text == ""{
@@ -56,6 +69,7 @@ class ViewController: UIViewController {
                         print("signed up")
                         self.activityIndicator.stopAnimating()
                         UIApplication.shared.endIgnoringInteractionEvents()
+                        self.performSegue(withIdentifier: "toUserList", sender: self)
                     }
                 })
             }
@@ -73,6 +87,7 @@ class ViewController: UIViewController {
                         print("logged in")
                         self.activityIndicator.stopAnimating()
                         UIApplication.shared.endIgnoringInteractionEvents()
+                        self.performSegue(withIdentifier: "toUserList", sender: self)
                     }
                 })
             
