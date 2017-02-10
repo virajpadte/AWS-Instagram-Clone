@@ -14,8 +14,9 @@ class UsersViewController: UITableViewController {
     @IBOutlet var table: UITableView!
     //make empty arrays for holding usernames and objectIDs
     
-    var userNames = [String]()
     var userIDs = [String]()
+    var users = [String: [String: Bool]]()
+    
     
     @IBAction func logout(_ sender: Any) {
         PFUser.logOut()
@@ -49,8 +50,9 @@ class UsersViewController: UITableViewController {
                     for element in retrivedObject{
                         if let individualUser = element as? PFUser {
                             if individualUser.username! != PFUser.current()?.username{
-                                self.userNames.append(individualUser.username!)
+                                //self.userNames.append(individualUser.username!)
                                 self.userIDs.append(individualUser.objectId!)
+                                self.users[individualUser.objectId!] = [individualUser.username!:false]
                             }
                         }
                     }
@@ -58,12 +60,30 @@ class UsersViewController: UITableViewController {
                 
             }
             //print acquired data
-            print(self.userNames)
             print(self.userIDs)
-            //referesh array data
-            self.table.reloadData()
+            print(self.users)
         }
         )
+        let newQuery = PFQuery(className: "Followers")
+        newQuery.whereKey("Follower", equalTo: PFUser.current()?.objectId)
+        newQuery.findObjectsInBackground { (objects, error) in
+            if error != nil{
+                print(error)
+            }
+            else if let retrivedObjects = objects{
+                for object in retrivedObjects{
+                    if let followingID = object.value(forKey: "Following") as? String{
+                        print("Following ID: \(followingID)")
+                        //mark the ones the current user is following
+                        self.users.updateValue([(self.users[followingID]?.keys.first)!: true], forKey: followingID)
+                        print("updated")
+                    }
+                
+                }
+            }
+            print(self.users)
+            self.table.reloadData()
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -80,13 +100,23 @@ class UsersViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return userNames.count
+        return userIDs.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
-        cell.textLabel?.text = userNames[indexPath.row]
+        //check for ticks
+        //get username
+        let username = users[userIDs[indexPath.row]]?.keys.first
+        print("Username \(username)")
+        if (users[userIDs[indexPath.row]]?[username!])!{
+            cell.textLabel?.text = username
+            cell.accessoryType = UITableViewCellAccessoryType.checkmark
+        }
+        else{
+            cell.textLabel?.text = users[userIDs[indexPath.row]]?.keys.first
+        }
         return cell
     }
  
@@ -97,7 +127,7 @@ class UsersViewController: UITableViewController {
             //already checked so now we need to uncheck
             //uncheck the selected a row
             //before unchecking, alert the user
-            let alertController = UIAlertController(title: "Unfollow \(userNames[indexPath.row].components(separatedBy: "@")[0])", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
+            let alertController = UIAlertController(title: "Unfollow", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
             alertController.addAction(UIAlertAction(title: "Unfollow", style: UIAlertActionStyle.destructive, handler: { (alerted) in
                 self.table.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
                 //update the entry in the Followers class
@@ -124,12 +154,8 @@ class UsersViewController: UITableViewController {
                                 }
                             })
                         }
-                    
                     }
                 })
-                
-                
-                
             }))
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: { (alerted) in
             }))
