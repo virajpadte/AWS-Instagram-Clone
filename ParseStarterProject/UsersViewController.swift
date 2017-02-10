@@ -16,6 +16,7 @@ class UsersViewController: UITableViewController {
     
     var userIDs = [String]()
     var users = [String: [String: Bool]]()
+    let refereshController = UIRefreshControl()
     
     
     @IBAction func logout(_ sender: Any) {
@@ -25,18 +26,16 @@ class UsersViewController: UITableViewController {
         
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
-        self.navigationController?.isNavigationBarHidden = false
-        self.navigationItem.hidesBackButton = true
+    
+    func getData(){
         
+        print("getting data")
         //get the list of all the registered users
+        //before we get data lets empty all the data arrays
+        
+        userIDs.removeAll()
+        userIDs.removeAll()
+        
         
         let query = PFUser.query()
         query?.findObjectsInBackground(block: { (object, error) in
@@ -62,6 +61,7 @@ class UsersViewController: UITableViewController {
             //print acquired data
             print(self.userIDs)
             print(self.users)
+            print("first query to get list")
         }
         )
         let newQuery = PFQuery(className: "Followers")
@@ -77,13 +77,28 @@ class UsersViewController: UITableViewController {
                         //mark the ones the current user is following
                         self.users.updateValue([(self.users[followingID]?.keys.first)!: true], forKey: followingID)
                         print("updated")
+                        self.table.reloadData()
                     }
-                
                 }
             }
-            print(self.users)
-            self.table.reloadData()
+            print("fetch query to get followers data")
+            self.refereshController.endRefreshing()
+            print("ended refreshing")
         }
+    }
+    
+    override func viewDidLoad() {
+        self.navigationController?.isNavigationBarHidden = false
+        self.navigationItem.hidesBackButton = true
+        super.viewDidLoad()
+        getData()
+        
+        //pull to refresh
+        refereshController.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refereshController.addTarget(self, action: #selector(getData), for: UIControlEvents.valueChanged)
+        table.addSubview(refereshController)
+        
+
     }
 
     override func didReceiveMemoryWarning() {
