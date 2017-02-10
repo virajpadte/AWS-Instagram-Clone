@@ -143,6 +143,7 @@ class UsersViewController: UITableViewController {
             //uncheck the selected a row
             //before unchecking, alert the user
             let alertController = UIAlertController(title: "Unfollow", message: "", preferredStyle: UIAlertControllerStyle.actionSheet)
+            
             alertController.addAction(UIAlertAction(title: "Unfollow", style: UIAlertActionStyle.destructive, handler: { (alerted) in
                 self.table.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
                 //update the entry in the Followers class
@@ -171,8 +172,14 @@ class UsersViewController: UITableViewController {
                         }
                     }
                 })
+                alertController.dismiss(animated: true, completion: nil)
+                print("dismissed")
             }))
             alertController.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: { (alerted) in
+                //dismiss the alert on tapping cancel
+                print("cancelled")
+                alertController.dismiss(animated: true, completion: nil)
+                print("dismissed")
             }))
             self.present(alertController, animated: true, completion: nil)
             
