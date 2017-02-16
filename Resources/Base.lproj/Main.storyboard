@@ -6,6 +6,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -34,11 +35,18 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Users" id="VFE-do-RAB">
-                        <barButtonItem key="leftBarButtonItem" title="Post" id="UoG-WA-Mz5">
-                            <connections>
-                                <segue destination="D1S-vl-fLN" kind="show" identifier="toPost" id="c3F-MI-6Nf"/>
-                            </connections>
-                        </barButtonItem>
+                        <leftBarButtonItems>
+                            <barButtonItem title="Post" id="UoG-WA-Mz5">
+                                <connections>
+                                    <segue destination="D1S-vl-fLN" kind="show" identifier="toPost" id="c3F-MI-6Nf"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Feed" id="hEE-Sn-ckU">
+                                <connections>
+                                    <action selector="feed:" destination="KrF-eA-iHO" id="z03-ZA-vNv"/>
+                                </connections>
+                            </barButtonItem>
+                        </leftBarButtonItems>
                         <barButtonItem key="rightBarButtonItem" title="logout" id="mA5-44-t9i">
                             <connections>
                                 <action selector="logout:" destination="KrF-eA-iHO" id="mza-ow-ZFG"/>
@@ -49,6 +57,7 @@
                     <connections>
                         <outlet property="table" destination="p25-A3-tvi" id="OPZ-ee-oHW"/>
                         <segue destination="BYZ-38-t0r" kind="show" identifier="toLoginPage" id="gkr-G6-9g6"/>
+                        <segue destination="Afh-F9-zmJ" kind="show" identifier="toFeed" id="ZQE-dG-k8n"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Sbk-P1-JFu" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -200,6 +209,34 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="7ym-Ee-3Bq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-687.20000000000005" y="445.72713643178412"/>
+        </scene>
+        <!--Feed View Controller-->
+        <scene sceneID="jrZ-NV-XpI">
+            <objects>
+                <tableViewController id="Afh-F9-zmJ" customClass="FeedViewController" customModule="ParseStarterProject_Swift" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="Ksv-97-mfO">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="feedCell" id="vCc-1m-hFi">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="vCc-1m-hFi" id="bRH-GP-aQH">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="Afh-F9-zmJ" id="C9s-h1-l8W"/>
+                            <outlet property="delegate" destination="Afh-F9-zmJ" id="DIT-5A-TZ0"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GQZ-Qm-4Sw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-210" y="-383"/>
         </scene>
     </scenes>
 </document>

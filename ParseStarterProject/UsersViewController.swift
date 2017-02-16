@@ -27,6 +27,28 @@ class UsersViewController: UITableViewController {
     }
 
     
+    @IBAction func feed(_ sender: Any) {
+        print("getFeed")
+        //find the followers for the current user
+        //get items from all following and arrange based on posting sequence
+        //segue to a new viewcontroller
+        performSegue(withIdentifier: "toFeed", sender: self)
+        //this is a table
+        //show this based on the sequnce we found
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toFeed"{
+            let destination = segue.destination as! FeedViewController
+            //count the posts of all people current user is following
+            destination.feedCount = 4
+        }
+        else if segue.identifier == "toLoginPage"{
+            print("segue to login page")
+        }
+        print("prepare for segue")
+    }
+    
     func getData(){
         
         print("getting data")
@@ -38,6 +60,7 @@ class UsersViewController: UITableViewController {
         
         
         let query = PFUser.query()
+        
         query?.findObjectsInBackground(block: { (object, error) in
             if error != nil{
                 print(error)

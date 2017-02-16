@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		55A125A31E4C46A00061FD8F /* UsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A125A21E4C46A00061FD8F /* UsersViewController.swift */; };
 		55A125A51E4D7D020061FD8F /* PostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A125A41E4D7D020061FD8F /* PostViewController.swift */; };
+		55D8B0691E553D210069C4AB /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D8B0681E553D210069C4AB /* FeedViewController.swift */; };
 		814C3ACA1B69877600E307BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 814C3AC61B69877600E307BB /* Main.storyboard */; };
 		814C3ACB1B69877600E307BB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 814C3AC81B69877600E307BB /* Images.xcassets */; };
 		81BA814B1A49DA1800E65899 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81BA814A1A49DA1800E65899 /* AppDelegate.swift */; };
@@ -24,6 +25,7 @@
 /* Begin PBXFileReference section */
 		55A125A21E4C46A00061FD8F /* UsersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsersViewController.swift; sourceTree = "<group>"; };
 		55A125A41E4D7D020061FD8F /* PostViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostViewController.swift; sourceTree = "<group>"; };
+		55D8B0681E553D210069C4AB /* FeedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedViewController.swift; sourceTree = "<group>"; };
 		814C3AC71B69877600E307BB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		814C3AC81B69877600E307BB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		814C3AC91B69877600E307BB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 				814C3AC61B69877600E307BB /* Main.storyboard */,
 				55A125A21E4C46A00061FD8F /* UsersViewController.swift */,
 				55A125A41E4D7D020061FD8F /* PostViewController.swift */,
+				55D8B0681E553D210069C4AB /* FeedViewController.swift */,
 			);
 			path = ParseStarterProject;
 			sourceTree = "<group>";
@@ -192,6 +195,7 @@
 			files = (
 				55A125A51E4D7D020061FD8F /* PostViewController.swift in Sources */,
 				81BA814D1A49DA1800E65899 /* ViewController.swift in Sources */,
+				55D8B0691E553D210069C4AB /* FeedViewController.swift in Sources */,
 				55A125A31E4C46A00061FD8F /* UsersViewController.swift in Sources */,
 				81BA814B1A49DA1800E65899 /* AppDelegate.swift in Sources */,
 			);
