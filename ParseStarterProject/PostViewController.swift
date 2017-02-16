@@ -63,6 +63,7 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
         let compressedImage = UIImageJPEGRepresentation(imageVIew.image!, 1)
         let imageData = PFFile(name: "image.jpg", data: compressedImage!)
         post.setObject(imageData, forKey: "Pic")
+        post.setObject(PFUser.current()?.objectId, forKey: "uploaderID")
         post.saveInBackground { (success, error) in
             
             self.activityController.stopAnimating()

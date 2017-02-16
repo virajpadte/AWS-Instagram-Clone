@@ -10,6 +10,8 @@ import UIKit
 import Parse
 class UsersViewController: UITableViewController {
     
+    var feedFrom = [String:String]()
+
     
     @IBOutlet var table: UITableView!
     //make empty arrays for holding usernames and objectIDs
@@ -23,14 +25,35 @@ class UsersViewController: UITableViewController {
         PFUser.logOut()
         performSegue(withIdentifier: "toLoginPage", sender: self)
         print("logout")
-        
     }
 
     
     @IBAction func feed(_ sender: Any) {
+        feedFrom.removeAll()
+        //referesh all the data to take new data into affect
         print("getFeed")
+        print("users dict now: \(users)")
         //find the followers for the current user
+        for (objectID,userDict) in users {
+            for (username,status) in userDict{
+                if status == true{
+                    feedFrom[objectID] = username
+                }
+            }
+        }
+        print(feedFrom)
         //get items from all following and arrange based on posting sequence
+        let query = PFQuery(className: "Posts")
+        query.addDescendingOrder("updatedAt")
+        query.whereKey("uploaderID", containedIn: Array(feedFrom.keys))
+        query.findObjectsInBackground(block: { (objects, error) in
+            if error != nil{
+                    print(error)
+            }
+            else if let retrivedObejects = objects{
+                        print(retrivedObejects)
+            }
+        })
         //segue to a new viewcontroller
         performSegue(withIdentifier: "toFeed", sender: self)
         //this is a table
@@ -54,13 +77,9 @@ class UsersViewController: UITableViewController {
         print("getting data")
         //get the list of all the registered users
         //before we get data lets empty all the data arrays
-        
         userIDs.removeAll()
-        userIDs.removeAll()
-        
-        
+        //users.removeAll()
         let query = PFUser.query()
-        
         query?.findObjectsInBackground(block: { (object, error) in
             if error != nil{
                 print(error)
@@ -83,12 +102,16 @@ class UsersViewController: UITableViewController {
                 
             }
             //print acquired data
-            print(self.userIDs)
-            print(self.users)
-            print("first query to get list")
+            //print(self.userIDs)
+            //print(self.users)
+            //print("first query to get list")
         }
         )
+        getCheckMarks()
         
+    }
+    
+    func getCheckMarks(){
         //this section is just for putting following marks on the user list
         let newQuery = PFQuery(className: "Followers")
         newQuery.whereKey("Follower", equalTo: PFUser.current()?.objectId)
@@ -106,11 +129,11 @@ class UsersViewController: UITableViewController {
                         self.users.updateValue([(self.users[followingID]?.keys.first)!: true], forKey: followingID)
                         print("updated")
                         self.table.reloadData()
- 
+                        
                     }
                 }
             }
-            print("fetch query to get followers data")
+            print("fetched query to get followers data \(self.users)")
             self.refereshController.endRefreshing()
             print("ended refreshing")
         }
@@ -179,11 +202,17 @@ class UsersViewController: UITableViewController {
                 //fetch data corresponding to the current user's object id and the followers object id
                 let currentObjectID = PFUser.current()?.objectId
                 let followingObjectID = self.userIDs[indexPath.row]
+                //update locally
+                print("To be updated \(self.users[followingObjectID])")
+                for key in (self.users[followingObjectID]?.keys)!{
+                    self.users[followingObjectID]?.updateValue(false, forKey: key)
+                }
+                print("updated locally")
                 
+                //updated on server
                 let query = PFQuery(className: "Followers")
                 query.whereKey("Follower", equalTo: currentObjectID)
                 query.whereKey("Following", equalTo: followingObjectID)
-
                 query.findObjectsInBackground(block: { (objects, error) in
                     if error != nil{
                         print(error)
@@ -216,11 +245,20 @@ class UsersViewController: UITableViewController {
             //unchecked row .. so we can check it
             //check the selected a row
             table.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.checkmark
-            //add an entry in the Followers class
             
-            let newFollowerEntry = PFObject(className: "Followers")
             let currentObjectID = PFUser.current()?.objectId
             let followingObjectID = userIDs[indexPath.row]
+            //update locally
+            print("To be updated \(self.users[followingObjectID])")
+            for key in (self.users[followingObjectID]?.keys)!{
+                self.users[followingObjectID]?.updateValue(true, forKey: key)
+            }
+            print("updated locally")
+
+            //updated on server
+            //add an entry in the Followers class
+            let newFollowerEntry = PFObject(className: "Followers")
+            
             newFollowerEntry.setObject(currentObjectID, forKey: "Follower")
             newFollowerEntry.setObject(followingObjectID, forKey: "Following")
             newFollowerEntry.saveInBackground(block: { (saved, error) in
@@ -232,53 +270,5 @@ class UsersViewController: UITableViewController {
                 }
             })
         }
-        
     }
-    
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-
-    */
-    
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
