@@ -9,10 +9,13 @@
 import UIKit
 import Parse
 
+
 class PostViewController: UIViewController,UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     @IBOutlet weak var message: UITextField!
     @IBOutlet weak var imageVIew: UIImageView!
     let imagePicker = UIImagePickerController()
+    //activity indicator
+    let activityController = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
     
     func showAlert(title: String, message: String){
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.alert)
@@ -42,18 +45,29 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
             imageVIew.image = image
             //dismiss the picker
             imagePicker.dismiss(animated: true, completion: nil)
-            
-            
         }
     }
     @IBAction func post(_ sender: Any) {
+        
         //post content on the parse server
+        activityController.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
+        activityController.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+        activityController.center = view.center
+        view.addSubview(activityController)
+        activityController.startAnimating()
+        UIApplication.shared.beginIgnoringInteractionEvents()
+ 
+        
         let post = PFObject(className: "Posts")
         post.setObject(message.text!, forKey: "message")
         let compressedImage = UIImageJPEGRepresentation(imageVIew.image!, 1)
         let imageData = PFFile(name: "image.jpg", data: compressedImage!)
         post.setObject(imageData, forKey: "Pic")
         post.saveInBackground { (success, error) in
+            
+            self.activityController.stopAnimating()
+            UIApplication.shared.endIgnoringInteractionEvents()
+            
             if error != nil{
                 print(error)
                 //create an alter to the user
@@ -66,6 +80,7 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
                 
                 
             }
+            
         }
     }
 
