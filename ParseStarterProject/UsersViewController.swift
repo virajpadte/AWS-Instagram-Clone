@@ -49,9 +49,10 @@ class UsersViewController: UITableViewController {
                     for element in retrivedObject{
                         if let individualUser = element as? PFUser {
                             if individualUser.username! != PFUser.current()?.username{
-                                //self.userNames.append(individualUser.username!)
                                 self.userIDs.append(individualUser.objectId!)
                                 self.users[individualUser.objectId!] = [individualUser.username!:false]
+                                    self.table.reloadData()
+                                
                             }
                         }
                     }
@@ -64,6 +65,8 @@ class UsersViewController: UITableViewController {
             print("first query to get list")
         }
         )
+        
+        //this section is just for putting following marks on the user list
         let newQuery = PFQuery(className: "Followers")
         newQuery.whereKey("Follower", equalTo: PFUser.current()?.objectId)
         newQuery.findObjectsInBackground { (objects, error) in
@@ -71,13 +74,16 @@ class UsersViewController: UITableViewController {
                 print(error)
             }
             else if let retrivedObjects = objects{
+                print("retrivedObjects: \(retrivedObjects)")
                 for object in retrivedObjects{
+                    
                     if let followingID = object.value(forKey: "Following") as? String{
                         print("Following ID: \(followingID)")
                         //mark the ones the current user is following
                         self.users.updateValue([(self.users[followingID]?.keys.first)!: true], forKey: followingID)
                         print("updated")
                         self.table.reloadData()
+ 
                     }
                 }
             }
