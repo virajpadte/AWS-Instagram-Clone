@@ -26,9 +26,7 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
         //since you are wanting to show a new viewcontroller in your existing new controller
         //present always couples with a dimiss
         self.present(alert, animated: true, completion: nil)
-        
     }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -38,7 +36,6 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
         imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary
         self.present(imagePicker, animated: true, completion: nil)
     }
-    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage{
             //set image to the display
@@ -48,7 +45,6 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
         }
     }
     @IBAction func post(_ sender: Any) {
-        
         //post content on the parse server
         activityController.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.whiteLarge
         activityController.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
@@ -56,8 +52,6 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
         view.addSubview(activityController)
         activityController.startAnimating()
         UIApplication.shared.beginIgnoringInteractionEvents()
- 
-        
         let post = PFObject(className: "Posts")
         post.setObject(message.text!, forKey: "message")
         let compressedImage = UIImageJPEGRepresentation(imageVIew.image!, 1)
@@ -65,10 +59,8 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
         post.setObject(imageData, forKey: "Pic")
         post.setObject(PFUser.current()?.objectId, forKey: "uploaderID")
         post.saveInBackground { (success, error) in
-            
             self.activityController.stopAnimating()
             UIApplication.shared.endIgnoringInteractionEvents()
-            
             if error != nil{
                 print(error)
                 //create an alter to the user
@@ -78,15 +70,10 @@ class PostViewController: UIViewController,UINavigationControllerDelegate, UIIma
                 self.showAlert(title: "Yeah!", message: "Your image is posted")
                 self.message.text = ""
                 self.imageVIew.image = UIImage()
-                
-                
             }
-            
         }
     }
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
 }

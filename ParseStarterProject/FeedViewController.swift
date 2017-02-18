@@ -7,18 +7,105 @@
 //
 
 import UIKit
+import Parse
 
+class FeedCell: UITableViewCell{
+
+    @IBOutlet weak var postImage: UIImageView!
+    @IBOutlet weak var imageCaption: UILabel!
+    @IBOutlet weak var username: UILabel!
+}
 
 
 class FeedViewController: UITableViewController {
     
     //class variable
-    var feedCount = 0
+    let refereshController = UIRefreshControl()
+    var feedFrom = [String:String]()
+    //var postsDict = [String:String]()
+    //var postsDict = [String:[String:UIImage]]()
+    var postMessages = [String]()
+    var postUsers = [String]()
+    var postImages = [UIImage]()
+    
+    @IBOutlet var table: UITableView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        getPosts()
+        //pull to refresh
+        refereshController.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refereshController.addTarget(self, action: #selector(FeedViewController.getPosts), for: UIControlEvents.valueChanged)
+        table.addSubview(refereshController)
     }
-
+    
+    func getPosts(){
+        refereshController.endRefreshing()
+        postMessages.removeAll()
+        postUsers.removeAll()
+        postImages.removeAll()
+        
+        let query = PFQuery(className: "Posts")
+        query.order(byDescending: "updatedAt")
+        query.whereKey("uploaderID", containedIn: Array(feedFrom.keys))
+        query.findObjectsInBackground { (objects, error) in
+            if error != nil {
+                print("Error \(error)")
+            }
+            else{
+                print("no error in fetching")
+                print("objects \(objects)")
+                if let posts = objects{
+                    print("processed well")
+                    print("Num posts \(posts.count)")
+                    for post in posts{
+                        if let uploaderID = post["uploaderID"] as? String{
+                            if let imageCaption = post["message"] as? String{
+                                if let imageFile = post["Pic"] as? PFFile{
+                                    do{
+                                        let imageData = try imageFile.getData()
+                                        if let image = UIImage(data: imageData){
+                                            self.postUsers.append(uploaderID)
+                                            self.postMessages.append(imageCaption)
+                                            print(imageCaption)
+                                            self.postImages.append(image)
+                                            print("saved data")
+                                            self.table.reloadData()
+                                        }
+                                    }
+                                    catch{
+                                        print("some error")
+                                    }
+                                }
+                                //trying to get data in background messed up my order.. so I will have to skip this for now.
+                                    /*
+                                    imageFile.getDataInBackground(block: { (data, error) in
+                                        if error != nil{
+                                            print(error)
+                                        }
+                                        else if let imagedata = data{
+                                            if let image = UIImage(data: imagedata){
+                                                self.postUsers.append(uploaderID)
+                                                self.postMessages.append(imageCaption)
+                                                print(imageCaption)
+                                                self.postImages.append(image)
+                                                print("saved data")
+                                                self.table.reloadData()
+                                            }
+                                        }
+                                    })
+                                }
+                                */
+                            }
+                        }
+                    }
+                }
+                else{
+                    print("processing error")
+                }
+            }
+        }
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -32,58 +119,17 @@ class FeedViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return feedCount
+        return postMessages.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .default, reuseIdentifier: "feedCell")
-        cell.textLabel?.text = "Viraj"
+        //let dataArray = Array(postsDict.keys)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "feedCell", for: indexPath) as! FeedCell
+        if postMessages.count > 0{
+            cell.postImage.image = postImages[indexPath.row]
+            cell.imageCaption.text = postMessages[indexPath.row]
+            cell.username.text = postUsers[indexPath.row]
+        }
         return cell
     }
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

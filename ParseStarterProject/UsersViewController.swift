@@ -11,6 +11,8 @@ import Parse
 class UsersViewController: UITableViewController {
     
     var feedFrom = [String:String]()
+    var posts = [String:[String:UIImage]]()
+    
 
     
     @IBOutlet var table: UITableView!
@@ -26,8 +28,6 @@ class UsersViewController: UITableViewController {
         performSegue(withIdentifier: "toLoginPage", sender: self)
         print("logout")
     }
-
-    
     @IBAction func feed(_ sender: Any) {
         feedFrom.removeAll()
         //referesh all the data to take new data into affect
@@ -41,19 +41,7 @@ class UsersViewController: UITableViewController {
                 }
             }
         }
-        print(feedFrom)
-        //get items from all following and arrange based on posting sequence
-        let query = PFQuery(className: "Posts")
-        query.addDescendingOrder("updatedAt")
-        query.whereKey("uploaderID", containedIn: Array(feedFrom.keys))
-        query.findObjectsInBackground(block: { (objects, error) in
-            if error != nil{
-                    print(error)
-            }
-            else if let retrivedObejects = objects{
-                        print(retrivedObejects)
-            }
-        })
+        print("feedFrom \(feedFrom)")
         //segue to a new viewcontroller
         performSegue(withIdentifier: "toFeed", sender: self)
         //this is a table
@@ -64,7 +52,12 @@ class UsersViewController: UITableViewController {
         if segue.identifier == "toFeed"{
             let destination = segue.destination as! FeedViewController
             //count the posts of all people current user is following
-            destination.feedCount = 4
+            //destination.feedCount = feedFrom.count
+            destination.feedFrom = feedFrom
+            //getPosts and then segue
+            //getPosts()
+            //print("posts \(posts)")
+            //destination.posts = posts
         }
         else if segue.identifier == "toLoginPage"{
             print("segue to login page")
@@ -72,13 +65,12 @@ class UsersViewController: UITableViewController {
         print("prepare for segue")
     }
     
-    func getData(){
-        
+    func getUserData(){
         print("getting data")
         //get the list of all the registered users
         //before we get data lets empty all the data arrays
         userIDs.removeAll()
-        //users.removeAll()
+        users.removeAll()
         let query = PFUser.query()
         query?.findObjectsInBackground(block: { (object, error) in
             if error != nil{
@@ -94,23 +86,16 @@ class UsersViewController: UITableViewController {
                                 self.userIDs.append(individualUser.objectId!)
                                 self.users[individualUser.objectId!] = [individualUser.username!:false]
                                     self.table.reloadData()
-                                
                             }
                         }
                     }
                 }
-                
             }
-            //print acquired data
-            //print(self.userIDs)
-            //print(self.users)
-            //print("first query to get list")
         }
         )
         getCheckMarks()
-        
     }
-    
+
     func getCheckMarks(){
         //this section is just for putting following marks on the user list
         let newQuery = PFQuery(className: "Followers")
@@ -143,33 +128,29 @@ class UsersViewController: UITableViewController {
         self.navigationController?.isNavigationBarHidden = false
         self.navigationItem.hidesBackButton = true
         super.viewDidLoad()
-        getData()
+        getUserData()
         
         //pull to refresh
         refereshController.attributedTitle = NSAttributedString(string: "Pull to refresh")
-        refereshController.addTarget(self, action: #selector(getData), for: UIControlEvents.valueChanged)
+        refereshController.addTarget(self, action: #selector(getUserData), for: UIControlEvents.valueChanged)
         table.addSubview(refereshController)
-        
-
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return userIDs.count
     }
-
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "cell")
@@ -187,7 +168,6 @@ class UsersViewController: UITableViewController {
         return cell
     }
  
-
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCellAccessoryType.checkmark{
