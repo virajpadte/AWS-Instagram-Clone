@@ -24,14 +24,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     //--------------------------------------
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        
+        
         // Enable storing and querying data from Local Datastore.
         // Remove this line if you don't want to use Local Datastore features or want to use cachePolicy.
         Parse.enableLocalDatastore()
+    
+        //get keys from key.plist file
+        let path = Bundle.main.path(forResource: "keys", ofType: ".plist")
+        let server = (NSDictionary(contentsOfFile: path!)?["ParseServerCredentials"] as! NSDictionary)["server"] as! String
+        let clientKey = (NSDictionary(contentsOfFile: path!)?["ParseServerCredentials"] as! NSDictionary)["clientKey"] as! String
+        let applicationId = (NSDictionary(contentsOfFile: path!)?["ParseServerCredentials"] as! NSDictionary)["applicationId"] as! String
+        
         
         let parseConfiguration = ParseClientConfiguration(block: { (ParseMutableClientConfiguration) -> Void in
-            ParseMutableClientConfiguration.applicationId = "7b44e3349257935326bf90984081c831c4975dc0"
-            ParseMutableClientConfiguration.clientKey = "a48ab8f936bc68f7873e86ad03e44e37c1e9e820"
-            ParseMutableClientConfiguration.server = "http://ec2-54-91-189-207.compute-1.amazonaws.com:80/parse"
+            ParseMutableClientConfiguration.applicationId = applicationId
+            ParseMutableClientConfiguration.clientKey = clientKey
+            ParseMutableClientConfiguration.server = server
+            
         })
         
         Parse.initialize(with: parseConfiguration)
